@@ -5,9 +5,9 @@ webhook = DiscordWebhook(url='https://discord.com/api/webhooks/85870391525559503
 def sendAlert(productURL, productName, price, sku, imageURL, ATC):
     embed = DiscordEmbed(title=productName, url=productURL, color='03b2f8')
     embed.set_timestamp()
-    embed.add_embed_field(name='Price', value=price)
     embed.add_embed_field(name='SKU', value=sku)
-    embed.add_embed_field(name='Cart', value='N/A')
+    embed.add_embed_field(name='Price', value=price)
+    embed.add_embed_field(name='Add to cart', value=ATC, inline=False)
     embed.set_thumbnail(url=imageURL)
 
     webhook.add_embed(embed)
