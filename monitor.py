@@ -36,7 +36,6 @@ while True:
 
             response = requests.get(productURL, headers=headers)
             response.proxies = proxies
-            print(response.proxies)
             soup = BeautifulSoup(response.text, 'html.parser')
 
             productName = soup.find('h1', attrs={'class', 'v-fw-regular'}).get_text()
@@ -52,7 +51,7 @@ while True:
 
             availability = soup.find('button', attrs={'class': 'add-to-cart-button'}).get_text()
 
-            if (availability == 'Add to Cart'):
+            if (availability != 'Sold Out'):
                 sendAlert(productURL, productName, price, sku, imageURL, ATC)
                 print(productName + ' RESTOCKED')
             else:
