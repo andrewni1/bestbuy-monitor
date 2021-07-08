@@ -1,4 +1,4 @@
-from webhook import sendAlert
+from webhook import sendWalmartAlert
 import requests
 from bs4 import BeautifulSoup
 from discord_webhook import DiscordWebhook
@@ -20,7 +20,7 @@ with open('proxyList.txt') as f:
 proxyListLength = len(proxyList)
 
 while True:
-    with open('productList.txt') as f:
+    with open('walmartLinks.txt') as f:
         for line in f:
             line = line.strip()
             productURL = line
@@ -38,21 +38,22 @@ while True:
             response.proxies = proxies
             soup = BeautifulSoup(response.text, 'html.parser')
 
-            productName = soup.find('h1', attrs={'class', 'v-fw-regular'}).get_text()
-            imageURL = soup.find('img', attrs={'class', 'primary-image'})['src']
+            productName = soup.find('h1', attrs={'class', 'prod-ProductTitle'}).get_text()
+            imageURL = soup.find('img', attrs={'class', 'prod-hero-image-image'})['src']
 
-            rawSKU = soup.find('div', attrs={'class': 'sku product-data'}).get_text().strip()
-            sku = rawSKU.split('SKU:')[1]
+            urlArray = productURL.split('/')
+            arrayLength = len(urlArray)
+            sku = urlArray[arrayLength - 1]
 
-            rawPrice = soup.find('div', attrs={'class': 'priceView-hero-price'}).get_text()
-            price = rawPrice.split('Your')[0]
+            rawPrice = soup.find('span', attrs={'class': 'price-characteristic'}).get_text()
+            price = '$' + rawPrice
 
-            ATC = 'https://api.bestbuy.com/click/-/' + sku + '/cart'
+            ATC = 'https://affil.walmart.com/cart/addToCart?items=' + sku
 
-            availability = soup.find('button', attrs={'class': 'add-to-cart-button'}).get_text()
+            availability = soup.find('span', attrs={'class': 'spin-button-children'}).get_text()
 
             if (availability != 'Sold Out'):
-                sendAlert(productURL, productName, price, sku, imageURL, ATC)
+                sendWalmartAlert(productURL, productName, price, sku, imageURL, ATC)
                 print(productName + ' RESTOCKED')
             else:
                 print(productName + ' OOS')
